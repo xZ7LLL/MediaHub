@@ -8,7 +8,7 @@ class PageController extends Controller
 {
     public function accueil()
     {
-        return 'Accueil de MediaHub';
+        return view('accueil');
     }
 
     public function aPropos()
