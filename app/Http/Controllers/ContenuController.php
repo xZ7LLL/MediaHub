@@ -7,8 +7,11 @@ use App\Models\Publication;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePublicationRequest;
 use App\Http\Requests\UpdatePublicationRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 class ContenuController extends Controller
 {
+    use AuthorizesRequests;
     public function index(string $tri = 'recent')
     {
         $publications = Publication::with(['categorie', 'auteur'])
@@ -36,16 +39,18 @@ class ContenuController extends Controller
 
     public function edit(Publication $publication)
     {
-        $categories = Categorie::all();
+    $this->authorize('update', $publication);
 
-        return view('contenus.edit', compact('publication', 'categories'));
+    $categories = Categorie::all();
+
+    return view('contenus.edit', compact('publication', 'categories'));
     }
 
     public function store(StorePublicationRequest $request)
     {
-    $publication = Publication::create([
-        ...$request->validated(),
-        'user_id' => 1,
+        $publication = Publication::create([
+            ...$request->validated(),
+            'user_id' => auth()->id(),
     ]);
 
     return redirect()
@@ -55,6 +60,8 @@ class ContenuController extends Controller
 
 public function update(UpdatePublicationRequest $request, Publication $publication)
     {
+    $this->authorize('update', $publication);
+
     $publication->update($request->validated());
 
     return redirect()
@@ -62,12 +69,14 @@ public function update(UpdatePublicationRequest $request, Publication $publicati
         ->with('succes', 'Publication mise à jour avec succès.');
     }
 
-    public function destroy(Publication $publication)
+public function destroy(Publication $publication)
     {
-        $publication->delete();
+    $this->authorize('delete', $publication);
 
-        return redirect()
-            ->route('contenus.index')
-            ->with('succes', 'Publication supprimée avec succès.');
+    $publication->delete();
+
+    return redirect()
+        ->route('contenus.index')
+        ->with('succes', 'Publication supprimée avec succès.');
     }
 }

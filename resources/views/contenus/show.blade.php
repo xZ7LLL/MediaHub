@@ -14,5 +14,16 @@
         <p>Aucun commentaire pour le moment.</p>
     @endforelse
 
+    @can('update', $publication)
+    <a href="{{ route('contenus.edit', $publication) }}">Modifier</a>
+@endcan
+@can('delete', $publication)
+    <form method="POST" action="{{ route('contenus.destroy', $publication) }}">
+        @csrf
+        @method('DELETE')
+        <button type="submit">Supprimer</button>
+    </form>
+@endcan
+
     <a href="{{ route('contenus.index') }}">Retour à la liste</a>
 @endsection
