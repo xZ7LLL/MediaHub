@@ -5,8 +5,12 @@
         <title>@yield('titre', 'MediaHub')</title> 
         <link rel="stylesheet" href="{{ asset('css/app.css') }}"> 
     </head> 
-    <body> @include('partials.navigation') 
-        <main class="conteneur"> @yield('contenu') 
+    <body> @include('partials.navigation')
+        @if (session('succes'))
+    <div class="alerte alerte-succes">{{ session('succes') }}</div>
+        @endif 
+        <main class="conteneur"> @yield('contenu')
+             
 
         </main>
         

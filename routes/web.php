@@ -6,20 +6,21 @@ use App\Http\Controllers\ContenuController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [PageController::class, 'accueil']);
+Route::get('/', [PageController::class, 'accueil'])->name('accueil');
 Route::get('/a-propos', [PageController::class, 'aPropos'])->name('a-propos');
 
-Route::get('/categories', [CategorieController::class, 'index'])->name('categories.index');
+Route::resource('categories', CategorieController::class)
+    ->except(['show'])
+    ->parameters(['categories' => 'categorie']);
 
 Route::get('/contenus/{tri?}', [ContenuController::class, 'index'])
     ->where('tri', 'recent|ancien|titre')
     ->name('contenus.index');
 
+Route::resource('contenus', ContenuController::class)
+    ->except(['index'])
+    ->parameters(['contenus' => 'publication']);
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/tableau-de-bord', [AdminController::class, 'index'])->name('dashboard');
 });
-Route::get('/', [PageController::class, 'accueil'])->name('accueil');
-Route::resource('contenus', ContenuController::class)
-    ->except(['index'])
-    ->parameters(['contenus' => 'publication']);

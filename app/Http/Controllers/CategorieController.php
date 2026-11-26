@@ -2,12 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categorie;
 use Illuminate\Http\Request;
 
 class CategorieController extends Controller
 {
     public function index()
     {
-        return 'Liste des catégories';
+        $categories = Categorie::withCount('publications')->get();
+
+        return view('categories.index', compact('categories'));
+    }
+
+    public function create()
+    {
+        return view('categories.create');
+    }
+
+    public function store(Request $request)
+    {
+        Categorie::create($request->only('nom', 'slug'));
+
+        return redirect()
+            ->route('categories.index')
+            ->with('succes', 'Catégorie créée avec succès.');
+    }
+
+    public function edit(Categorie $categorie)
+    {
+        return view('categories.edit', compact('categorie'));
+    }
+
+    public function update(Request $request, Categorie $categorie)
+    {
+        $categorie->update($request->only('nom', 'slug'));
+
+        return redirect()
+            ->route('categories.index')
+            ->with('succes', 'Catégorie mise à jour avec succès.');
+    }
+
+    public function destroy(Categorie $categorie)
+    {
+        $categorie->delete();
+
+        return redirect()
+            ->route('categories.index')
+            ->with('succes', 'Catégorie supprimée avec succès.');
     }
 }
