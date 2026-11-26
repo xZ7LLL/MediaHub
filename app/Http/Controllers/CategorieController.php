@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCategorieRequest;
+use App\Http\Requests\UpdateCategorieRequest;
 
 class CategorieController extends Controller
 {
@@ -19,27 +21,29 @@ class CategorieController extends Controller
         return view('categories.create');
     }
 
-    public function store(Request $request)
-    {
-        Categorie::create($request->only('nom', 'slug'));
-
-        return redirect()
-            ->route('categories.index')
-            ->with('succes', 'Catégorie créée avec succès.');
-    }
+    
 
     public function edit(Categorie $categorie)
     {
         return view('categories.edit', compact('categorie'));
     }
 
-    public function update(Request $request, Categorie $categorie)
+    public function store(StoreCategorieRequest $request)
     {
-        $categorie->update($request->only('nom', 'slug'));
+    Categorie::create($request->validated());
 
-        return redirect()
-            ->route('categories.index')
-            ->with('succes', 'Catégorie mise à jour avec succès.');
+    return redirect()
+        ->route('categories.index')
+        ->with('succes', 'Catégorie créée avec succès.');
+    }
+
+public function update(UpdateCategorieRequest $request, Categorie $categorie)
+    {
+    $categorie->update($request->validated());
+
+    return redirect()
+        ->route('categories.index')
+        ->with('succes', 'Catégorie mise à jour avec succès.');
     }
 
     public function destroy(Categorie $categorie)
