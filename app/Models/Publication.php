@@ -6,25 +6,32 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Publication extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['titre', 'contenu', 'categorie_id', 'user_id'];
 
-    public function categorie(): BelongsTo
-    {
-        return $this->belongsTo(Categorie::class);
-    }
+
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function commentaires(): HasMany
+
+    public function categorie(): BelongsTo
     {
-        return $this->hasMany(Commentaire::class);
+        return $this->belongsTo(Categorie::class);
+    }
+    public function auteur(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    public function commentaires() 
+    { 
+        return $this->hasMany(Commentaire::class); 
     }
 }

@@ -15,9 +15,11 @@ Route::get('/contenus/{tri?}', [ContenuController::class, 'index'])
     ->where('tri', 'recent|ancien|titre')
     ->name('contenus.index');
 
-Route::resource('contenus', ContenuController::class)->except(['index']);
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/tableau-de-bord', [AdminController::class, 'index'])->name('dashboard');
 });
 Route::get('/', [PageController::class, 'accueil'])->name('accueil');
+Route::resource('contenus', ContenuController::class)
+    ->except(['index'])
+    ->parameters(['contenus' => 'publication']);

@@ -7,4 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Categorie extends Model
 {
     //
+    public function publications() 
+    {
+        return $this->hasMany(Publication::class);
+    }
 }

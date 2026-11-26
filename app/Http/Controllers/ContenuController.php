@@ -2,66 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Publication;
 use Illuminate\Http\Request;
 
 class ContenuController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index() 
-    { 
-        $contenus = [ 
-        (object) ['titre' => 'Court-métrage documentaire', 'description' => 'Un aperçu de la vie urbaine.'], 
-        (object) ['titre' => 'Podcast technologie', 'description' => 'Actualités du développement web.'],
-         ]; 
-         return view('contenus.index', ['contenus' => $contenus]); }
+    public function index(string $tri = 'recent')
+    {
+        $publications = Publication::with(['categorie', 'auteur'])
+            ->latest()
+            ->paginate(9);
 
-    /**
-     * Show the form for creating a new resource.
-     */
+        return view('contenus.index', ['publications' => $publications]);
+    }
+
     public function create()
     {
-        //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Publication $publication)
     {
-        return 'Détail du contenu numéro ' . $id;
+        $publication->load(['categorie', 'auteur', 'commentaires.auteur']);
+
+        return view('contenus.show', ['publication' => $publication]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
     }
 }
