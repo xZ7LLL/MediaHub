@@ -7,6 +7,11 @@
     @endauth
     @forelse ($publications as $publication)
         <x-carte :titre="$publication->titre">
+            @if ($publication->image)
+
+
+                <img src="{{ Storage::url($publication->image) }}" alt="{{ $publication->titre }}" width="200">
+            @endif
             <p>{{ \Illuminate\Support\Str::limit($publication->contenu, 120) }}</p>
             <p>Catégorie : {{ $publication->categorie->nom }}</p>
             <p>Auteur : {{ $publication->auteur->name }}</p>

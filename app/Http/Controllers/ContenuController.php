@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StorePublicationRequest;
 use App\Http\Requests\UpdatePublicationRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 class ContenuController extends Controller
 {
     use AuthorizesRequests;
@@ -47,22 +48,55 @@ class ContenuController extends Controller
     }
 
     public function store(StorePublicationRequest $request)
-    {
-        $publication = Publication::create([
-            ...$request->validated(),
-            'user_id' => auth()->id(),
-    ]);
+{
+    $donnees = $request->validated();
+
+    if ($request->hasFile('image')) {
+    $chemin = $request->file('image')->store('publications', 'public');
+    $donnees['image'] = $chemin;
+
+    $miniature = Image::read($request->file('image'))->cover(400, 300)->toJpeg(80);
+    Storage::disk('public')->put('publications/miniatures/' . basename($chemin), (string) $miniature);
+    }
+
+    if ($request->hasFile('fichier_media')) {
+        $fichier = $request->file('fichier_media');
+        $donnees['fichier_media'] = $fichier->store('medias', 'public');
+        $donnees['type_media'] = str_starts_with($fichier->getMimeType(), 'audio') ? 'audio' : 'video';
+    }
+
+    $donnees['user_id'] = auth()->id();
+
+    $publication = Publication::create($donnees);
 
     return redirect()
         ->route('contenus.show', $publication)
         ->with('succes', 'Publication créée avec succès.');
-    }
+}
 
 public function update(UpdatePublicationRequest $request, Publication $publication)
-    {
+{
     $this->authorize('update', $publication);
 
-    $publication->update($request->validated());
+    $donnees = $request->validated();
+
+    if ($request->hasFile('image')) {
+        if ($publication->image) {
+            Storage::disk('public')->delete($publication->image);
+        }
+        $donnees['image'] = $request->file('image')->store('publications', 'public');
+    }
+
+    if ($request->hasFile('fichier_media')) {
+        if ($publication->fichier_media) {
+            Storage::disk('public')->delete($publication->fichier_media);
+        }
+        $fichier = $request->file('fichier_media');
+        $donnees['fichier_media'] = $fichier->store('medias', 'public');
+        $donnees['type_media'] = str_starts_with($fichier->getMimeType(), 'audio') ? 'audio' : 'video';
+    }
+
+    $publication->update($donnees);
 
     return redirect()
         ->route('contenus.show', $publication)

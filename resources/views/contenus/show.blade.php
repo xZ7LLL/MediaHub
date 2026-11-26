@@ -2,6 +2,15 @@
 @section('titre', $publication->titre)
 @section('contenu')
     <h1>{{ $publication->titre }}</h1>
+    @if ($publication->image)
+    <img src="{{ Storage::url($publication->image) }}" alt="{{ $publication->titre }}" width="400">
+    @endif
+
+    @if ($publication->type_media === 'audio')
+    <audio controls src="{{ Storage::url($publication->fichier_media) }}"></audio>
+    @elseif ($publication->type_media === 'video')
+    <video controls width="400" src="{{ Storage::url($publication->fichier_media) }}"></video>
+    @endif
     <p>Categorie : {{ $publication->categorie->nom }} | Auteur : {{ $publication->auteur->name }}</p>
     <div>{{ $publication->contenu }}</div>
 

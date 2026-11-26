@@ -7,12 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Publication extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['titre', 'contenu', 'categorie_id', 'user_id'];
+    protected $fillable = [
+    'titre',
+    'contenu',
+    'categorie_id',
+    'user_id',
+    'image',
+    'fichier_media',
+    'type_media',
+    ];
 
 
 
@@ -33,5 +42,16 @@ class Publication extends Model
     public function commentaires() 
     { 
         return $this->hasMany(Commentaire::class); 
+    }
+    protected static function booted(): void
+    {
+    static::forceDeleting(function (Publication $publication) {
+        if ($publication->image) {
+            Storage::disk('public')->delete($publication->image);
+        }
+        if ($publication->fichier_media) {
+            Storage::disk('public')->delete($publication->fichier_media);
+        }
+    });
     }
 }
