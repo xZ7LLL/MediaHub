@@ -13,12 +13,12 @@ class StorePublicationRequest extends FormRequest
 
     public function rules(): array
     {
-    return [
-        'titre' => 'required|string|max:255',
-        'contenu' => 'required|string|min:20',
-        'categorie_id' => 'required|exists:categories,id',
-        'image' => 'nullable|file|image|max:2048',
-        'fichier_media' => 'nullable|file|mimes:mp3,mp4,wav|max:20480',
-    ];
+        return [
+            'titre' => 'required|string|max:255',
+            'contenu' => 'required|string|min:20',
+            'categorie_id' => 'required|exists:categories,id',
+            'image' => 'nullable|file|image|max:2048',
+            'fichier_media' => 'nullable|file|mimes:mp3,mp4,wav|max:20480',
+        ];
     }
 }
