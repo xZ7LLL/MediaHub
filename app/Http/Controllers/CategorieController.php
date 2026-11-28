@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categorie;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreCategorieRequest;
 use App\Http\Requests\UpdateCategorieRequest;
+use App\Models\Categorie;
+use Illuminate\Support\Facades\Cache;
 
 class CategorieController extends Controller
 {
     public function index()
     {
-        $categories = Categorie::withCount('publications')->get();
+        $categories = Cache::remember('categories.liste', 3600, function () {
+            return Categorie::withCount('publications')->get();
+        });
 
         return view('categories.index', compact('categories'));
     }
@@ -21,34 +23,38 @@ class CategorieController extends Controller
         return view('categories.create');
     }
 
-    
+    public function store(StoreCategorieRequest $request)
+    {
+        Categorie::create($request->validated());
+
+        Cache::forget('categories.liste');
+
+        return redirect()
+            ->route('categories.index')
+            ->with('succes', 'Catégorie créée avec succès.');
+    }
 
     public function edit(Categorie $categorie)
     {
         return view('categories.edit', compact('categorie'));
     }
 
-    public function store(StoreCategorieRequest $request)
+    public function update(UpdateCategorieRequest $request, Categorie $categorie)
     {
-    Categorie::create($request->validated());
+        $categorie->update($request->validated());
 
-    return redirect()
-        ->route('categories.index')
-        ->with('succes', 'Catégorie créée avec succès.');
-    }
+        Cache::forget('categories.liste');
 
-public function update(UpdateCategorieRequest $request, Categorie $categorie)
-    {
-    $categorie->update($request->validated());
-
-    return redirect()
-        ->route('categories.index')
-        ->with('succes', 'Catégorie mise à jour avec succès.');
+        return redirect()
+            ->route('categories.index')
+            ->with('succes', 'Catégorie mise à jour avec succès.');
     }
 
     public function destroy(Categorie $categorie)
     {
         $categorie->delete();
+
+        Cache::forget('categories.liste');
 
         return redirect()
             ->route('categories.index')

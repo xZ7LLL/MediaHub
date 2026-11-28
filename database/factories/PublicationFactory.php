@@ -13,7 +13,7 @@ class PublicationFactory extends Factory
         return [
             'titre' => fake()->sentence(6),
             'contenu' => fake()->paragraphs(3, true),
-            'categorie_id' => Categorie::inRandomOrder()->first()->id,
+            'categorie_id' => Categorie::query()->inRandomOrder()->value('id') ?? Categorie::factory(),
             'user_id' => User::factory(),
         ];
     }
